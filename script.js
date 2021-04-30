@@ -1,11 +1,34 @@
 // script.js
 
+// getting form and button elements
+const imgInput = document.getElementById("image-input");
+const txtForm = document.getElementById("generate-meme");
+const submitBtn = document.querySelector('button[type="submit"]');
+const clearBtn = document.querySelector('button[type="reset"]');
+const readTextBtn = document.querySelector('button[type="button"]');
+
+// getting canvas
+const canvas = document.getElementById("user-image");
+
 const img = new Image(); // used to load image from <input> and draw to canvas
+let topText = "";
+let bottomText = "";
 
 // Fires whenever the img object loads a new image (such as with img.src =)
 img.addEventListener('load', () => {
-  // TODO
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,400,400);
 
+  // drawing black rect
+  ctx.fillStyle = "rgba(0, 0, 0, 1)";
+  ctx.fillRect(0,0,400,400);
+
+  // getting image dimensions for canvas
+  const dims = getDimmensions(400, 400, img.width, img.height);
+
+  // drawing image on canvas
+  ctx.drawImage(img, dims.startX, dims.startY, dims.width, dims.height);
+  
   // Some helpful tips:
   // - Fill the whole Canvas with black first to add borders on non-square images, then draw on top
   // - Clear the form when a new image is selected
@@ -51,3 +74,59 @@ function getDimmensions(canvasWidth, canvasHeight, imageWidth, imageHeight) {
 
   return { 'width': width, 'height': height, 'startX': startX, 'startY': startY }
 }
+
+// assigning functionality to image input file
+imgInput.addEventListener('change', (e) => {
+  e.preventDefault();
+  console.log("change");
+  img.src = URL.createObjectURL(e.target.files[0]);
+  img.alt = e.target.value;
+});
+
+// assigning functionality to clear button
+clearBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,400,400);
+  topText = "";
+  bottomText = "";
+
+  // toggling buttons
+  clearBtn.disabled = true;
+  readTextBtn.disabled = true;
+  submitBtn.disabled = false;
+
+  //TODO: clear image from canvas
+});
+
+// assigning functionality to read button
+readTextBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  // TODO: implement read button
+});
+
+// assigning generate text button functionality
+submitBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  // Getting field contents and setting them
+  var formData = new FormData(txtForm);
+  topText = formData.get("textTop");
+  bottomText = formData.get("textBottom");
+
+  if (topText == "" && bottomText == "") {
+    return;
+  }
+
+  // For debugging
+  // console.log(topText);
+  // console.log(bottomText);
+
+  // updating button visibility
+  clearBtn.disabled = false;
+  readTextBtn.disabled = false;
+  submitBtn.disabled = true;
+
+  // TODO: update canvas
+});
+
