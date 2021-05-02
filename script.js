@@ -6,6 +6,40 @@ const txtForm = document.getElementById("generate-meme");
 const submitBtn = document.querySelector('button[type="submit"]');
 const clearBtn = document.querySelector('button[type="reset"]');
 const readTextBtn = document.querySelector('button[type="button"]');
+const volumeBtn = document.querySelector('input[type="range"]');
+const volumeImg = document.getElementById("volume-group").firstElementChild;
+
+console.log(volumeImg);
+
+// creating speech synth objects and voice elements
+var synth = window.speechSynthesis;
+var volumeLvl = 100;
+
+// initializing voice options and synthesis
+function populateVoiceList() {
+  var voices = synth.getVoices();
+  var voiceSelect = document.getElementById("voice-selection");
+  voiceSelect.removeChild(voiceSelect.firstChild);
+  voiceSelect.disabled = false;
+
+  for (let i = 0; i < voices.length ; i++) {
+    var option = document.createElement('option');
+    option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
+
+    if(voices[i].default) {
+      option.textContent += ' -- DEFAULT';
+    }
+
+    option.setAttribute('data-lang', voices[i].lang);
+    option.setAttribute('data-name', voices[i].name);
+    voiceSelect.appendChild(option);
+  }
+}
+
+populateVoiceList();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = populateVoiceList;
+}
 
 // getting canvas
 const canvas = document.getElementById("user-image");
@@ -28,11 +62,6 @@ img.addEventListener('load', () => {
 
   // drawing image on canvas
   ctx.drawImage(img, dims.startX, dims.startY, dims.width, dims.height);
-  
-  // Some helpful tips:
-  // - Fill the whole Canvas with black first to add borders on non-square images, then draw on top
-  // - Clear the form when a new image is selected
-  // - If you draw the image to canvas here, it will update as soon as a new image is selected
 });
 
 /**
@@ -83,6 +112,23 @@ imgInput.addEventListener('change', (e) => {
   img.alt = e.target.value;
 });
 
+volumeBtn.addEventListener('change', (e) => {
+  volumeLvl = e.target.value;
+  if (volumeLvl >= 67) {
+    volumeImg.src = "icons/volume-level-3.svg";
+    volumeImg.alt = "Volume Level 3";
+  } else if (volumeLvl >= 34) {
+    volumeImg.src = "icons/volume-level-2.svg";
+    volumeImg.alt = "Volume Level 2";
+  } else if (volumeLvl >= 1) {
+    volumeImg.src = "icons/volume-level-1.svg";
+    volumeImg.alt = "Volume Level 1";
+  } else {
+    volumeImg.src = "icons/volume-level-0.svg";
+    volumeImg.alt = "Volume Level 0";
+  }
+})
+
 // assigning functionality to clear button
 clearBtn.addEventListener('click', (e) => {
   e.preventDefault();
@@ -95,14 +141,29 @@ clearBtn.addEventListener('click', (e) => {
   clearBtn.disabled = true;
   readTextBtn.disabled = true;
   submitBtn.disabled = false;
-
-  //TODO: clear image from canvas
 });
 
 // assigning functionality to read button
 readTextBtn.addEventListener('click', (e) => {
   e.preventDefault();
-  // TODO: implement read button
+
+  // getting utterance
+  var toUtter = new SpeechSynthesisUtterance(topText);
+  var voiceSelect = document.getElementById("voice-selection");
+  var voices = synth.getVoices();
+
+  // choosing voice and volume
+  var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+  for (var i = 0; i < voices.length; i++) {
+    if(voices[i].name === selectedOption) {
+      toUtter.voice = voices[i];
+    }
+  }
+
+  toUtter.volume = volumeLvl/100;
+  synth.speak(toUtter);
+  toUtter.text = bottomText;
+  synth.speak(toUtter);
 });
 
 // assigning generate text button functionality
@@ -118,15 +179,17 @@ submitBtn.addEventListener('click', (e) => {
     return;
   }
 
-  // For debugging
-  // console.log(topText);
-  // console.log(bottomText);
-
   // updating button visibility
   clearBtn.disabled = false;
   readTextBtn.disabled = false;
   submitBtn.disabled = true;
 
-  // TODO: update canvas
+  // updating canvas
+  var ctx = canvas.getContext('2d');
+  ctx.font = '40px impact';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = "white";
+  ctx.fillText(topText, 200, 50);
+  ctx.fillText(bottomText, 200, 375);
 });
 
