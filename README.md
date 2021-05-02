@@ -9,5 +9,7 @@ https://smontesd.github.io/Lab5/
 
 ## Part 2:
 
-note 18 the bot did not respond even though I successfully merged the last step
+note: 
+I completed part 2 up to step 18 and I completed the final step and merged but the bot approved the merge before I could review, so it is stuck on step 18.
+If you go to the issue and scroll down and click "A custorm workflow #7" you can see I finished all the steps.  
 https://github.com/smontesd/github-actions-for-ci/issues/5
