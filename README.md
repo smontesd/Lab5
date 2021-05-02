@@ -9,4 +9,5 @@ https://smontesd.github.io/Lab5/
 
 ## Part 2:
 
-LINK TO YOUR PART 2 REPOSITORY
+note 18 the bot did not respond even though I successfully merged the last step
+https://github.com/smontesd/github-actions-for-ci/issues/5
